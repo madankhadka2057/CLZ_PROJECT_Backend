@@ -1,7 +1,7 @@
 const { users } = require("../../model")
 const bcrypt=require('bcryptjs')
 const jwt=require("jsonwebtoken")
-const { where } = require("sequelize")
+
 
 //Register User!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 exports.registerUser = async (req, res) => {
@@ -21,10 +21,11 @@ exports.registerUser = async (req, res) => {
             message: "All filds are required"
         })
     }
-    const findUser = await users.findAll({ email: userDetails.email })
+    const findUser = await users.findAll({ where:{email: userDetails.email }})
     if (findUser.length !== 0) {
         return res.status(404).json({
-            message: "Email is already exist please Try another one"
+            message: "Email is already exist please Try another one",
+            data:findUser
         })
 
     }
@@ -45,7 +46,6 @@ exports.loginUser=async(req,res)=>{
     }
    })
     if(existEmail){
-        console.log(existEmail)
         const isMatch=bcrypt.compareSync(password,existEmail.password)
         if(isMatch){
             const token=jwt.sign({id:existEmail.id},process.env.SECRET_KEY,{

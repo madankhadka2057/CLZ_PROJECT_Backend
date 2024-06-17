@@ -3,10 +3,7 @@ const { sequelize } = require(".");
 
 module.exports=(sequelize,DataTypes)=>{
     const Product=sequelize.define("product",{
-        // rs_id:{
-        //     type:DataTypes.STRING,
-        //     allowNull:false
-        // }
+
         pName:{
             type:DataTypes.STRING,
             allowNull:false
@@ -20,7 +17,7 @@ module.exports=(sequelize,DataTypes)=>{
             allowNull:false
         },
         img:{
-            type:DataTypes.DECIMAL,
+            type:DataTypes.STRING,
             allowNull:false
         }
     })
