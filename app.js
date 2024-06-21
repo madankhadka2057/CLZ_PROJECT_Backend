@@ -1,20 +1,33 @@
 const express=require("express")
 const app=express()
+const cors=require('cors')
+app.use(cors({origin:"*"}))
 app.use(express.json())//convert request data to json formet
 app.use(express.urlencoded({extended:true}))
+
+// const allowedOrigin = 'http://localhost:5173';
+// const corsOptions = {
+//     origin: allowedOrigin,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true,
+//   };
+//   app.use(cors(corsOptions));
+
+
 const adminSeeder = require("./adminSeed")
 const isAuthenticated = require("./middleware/isAuthenticated")
 const checkRole = require("./middleware/checkRole")
 require('dotenv').config();//set environment for .env
 const PORT=process.env.PORT||3000
-
 const authRoute=require("./routers/auth/authRoute")
 const productRoute=require('./routers/admin/productRoute')
+const cartRoute=require('./routers/user/cartRoute')
 adminSeeder()
 app.use("/auth",authRoute)
 app.use('/admin/',productRoute)
+app.use('/user',cartRoute)
 app.use(express.static('uploads'))
-
 app.get("/",(req,res)=>{
     res.json({message:"Server is running"})
 })

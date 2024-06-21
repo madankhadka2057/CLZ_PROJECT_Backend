@@ -1,3 +1,4 @@
+const { FOREIGNKEYS } = require("sequelize/lib/query-types");
 const dbConfig = require("../config/dbConfig");
 const { Sequelize, DataTypes, HasMany, BelongsTo } = require("sequelize");
 
@@ -33,16 +34,17 @@ db.sequelize = sequelize;
 // importing model files
 db.products = require("./productModel.js")(sequelize, DataTypes);
 db.users = require("./userModel.js")(sequelize, DataTypes);
-db.orders=require('./orderModel.js')(sequelize,DataTypes)
+db.carts=require('./cartModel.js')(sequelize,DataTypes)
 
 
 
-//!making relation between them
-db.users.hasMany(db.orders)
-db.orders.belongsTo(db.users)
+db.users.hasMany(db.carts,{freignkey:"userId"})
+db.carts.belongsTo(db.users,{freignkey:"userId"})
 
-db.products.hasMany(db.orders)
-db.orders.belongsTo(db.products)
+db.products.hasMany(db.carts,{freignkey:"productId"})
+db.carts.belongsTo(db.products,{freignkey:"productId"})
+
+
 
 
 db.sequelize.sync({ force: false }).then(() => {
