@@ -23,10 +23,12 @@ const PORT=process.env.PORT||3000
 const authRoute=require("./routers/auth/authRoute")
 const productRoute=require('./routers/admin/productRoute')
 const cartRoute=require('./routers/user/cartRoute')
+const contactRouter=require('./routers/user/contactUsRoute')
 adminSeeder()
 app.use("/auth",authRoute)
 app.use('/admin/',productRoute)
 app.use('/user',cartRoute)
+app.use('/user',contactRouter)
 app.use(express.static('uploads'))
 app.get("/",(req,res)=>{
     res.json({message:"Server is running"})
