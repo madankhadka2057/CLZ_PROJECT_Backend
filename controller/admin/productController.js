@@ -127,12 +127,8 @@ exports.updateProduct = async (req, res) => {
             message: "Product with this name is already exist"
         })
     }
-    console.log(checkProduct)
-    const oldImage=checkProduct.img
-    console.log(oldImage)
     const lengthOfBackendUrl=process.env.BACKEND_URL.length
     const cutOldImage=oldImage.slice(lengthOfBackendUrl)
-    console.log(cutOldImage)
     if(req.file&&req.file.filename)
         {
             console.log("Madan khadka")

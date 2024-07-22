@@ -5,16 +5,15 @@ const jwt=require("jsonwebtoken")
 
 //Register User!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 exports.registerUser = async (req, res) => {
+    
     const hashedPass=bcrypt.hashSync(req.body.password,10)//hash the password entered from user
-    console.log(hashedPass)
-    const userDetails = {
-        userName: req.body.userName,
-        email: req.body.email,
-        phoneNumber: req.body.phoneNumber,
-        password: hashedPass
+
+    const userDetails={
+        userName:req.body.userName,
+        email:req.body.email,
+        phoneNumber:req.body.phoneNumber,
+        password:hashedPass
     }
-
-
 
     if (!userDetails.userName || !userDetails.email || !userDetails.phoneNumber || !userDetails.password) {
         return res.status(400).json({
@@ -22,6 +21,7 @@ exports.registerUser = async (req, res) => {
         })
     }
     const findUser = await users.findAll({ where:{email: userDetails.email }})
+    console.log(findUser)
     if (findUser.length !== 0) {
         return res.status(404).json({
             message: "Email is already exist please Try another one",
@@ -30,8 +30,12 @@ exports.registerUser = async (req, res) => {
 
     }
     await users.create(userDetails); 
-    res.status(201).send("User registered successfully");
+    res.status(200).json({
+        message:"User register successfully"
+    })
 }
+
+
 //login user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 exports.loginUser=async(req,res)=>{
     const {email,password}=req.body

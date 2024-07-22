@@ -16,20 +16,19 @@ app.use(express.urlencoded({extended:true}))
 
 
 const adminSeeder = require("./adminSeed")
-const isAuthenticated = require("./middleware/isAuthenticated")
-const checkRole = require("./middleware/checkRole")
 require('dotenv').config();//set environment for .env
 const PORT=process.env.PORT||3000
 const authRoute=require("./routers/auth/authRoute")
 const productRoute=require('./routers/admin/productRoute')
-const cartRoute=require('./routers/user/cartRoute')
+const cartRoute=require('./routers/auth/cartRoute')
 const contactRouter=require('./routers/user/contactUsRoute')
-adminSeeder()
+
 app.use("/auth",authRoute)
 app.use('/admin/',productRoute)
-app.use('/user',cartRoute)
+app.use('/cart',cartRoute)
 app.use('/user',contactRouter)
 app.use(express.static('uploads'))
+adminSeeder()
 app.get("/",(req,res)=>{
     res.json({message:"Server is running"})
 })
