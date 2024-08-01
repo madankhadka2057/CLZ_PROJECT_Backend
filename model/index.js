@@ -35,17 +35,29 @@ db.sequelize = sequelize;
 db.products = require("./productModel.js")(sequelize, DataTypes);
 db.users = require("./userModel.js")(sequelize, DataTypes);
 db.carts=require('./cartModel.js')(sequelize,DataTypes)
+db.orders=require('./orders.js')(sequelize,DataTypes)
+db.payments=require('./payment.js')(sequelize,DataTypes)
+db.orderDetails=require('./orderDetails.js')(sequelize,DataTypes)
 
 
 
+//Cart relations
 db.users.hasMany(db.carts,{freignkey:"userId"})
 db.carts.belongsTo(db.users,{freignkey:"userId"})
 
 db.products.hasMany(db.carts,{freignkey:"productId"})
 db.carts.belongsTo(db.products,{freignkey:"productId"})
 
+//OdrerDetails relation
+db.products.hasMany(db.orderDetails,{freignkey:"productId"})
+db.orderDetails.belongsTo(db.products,{freignkey:"productId"})
 
+db.orders.hasMany(db.orderDetails,{freignkey:"orderId"})
+db.orderDetails.belongsTo(db.orders,{freignkey:"orderId"})
 
+//Payment realation
+db.orders.hasMany(db.payments,{freignkey:"orderId"})
+db.payments.belongsTo(db.orders,{freignkey:"orderId"})
 
 db.sequelize.sync({ force: false }).then(() => {
   console.log("yes re-sync done");
