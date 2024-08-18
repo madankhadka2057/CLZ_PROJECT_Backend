@@ -4,7 +4,7 @@ module.exports=(sequelize,DataTypes)=>{
     const payments=sequelize.define("payment",{
 
         pidx:{
-            type:DataTypes.INTEGER,
+            type:DataTypes.STRING,
             allowNull:true
         },
         paymentMethod:{
@@ -12,10 +12,6 @@ module.exports=(sequelize,DataTypes)=>{
             allowNull:false
         },
         paymentStatus:{
-            type:DataTypes.DECIMAL,
-            allowNull:false
-        },
-        orderStatus:{
             type:DataTypes.ENUM,
             values:["paid","unpaid"],
             defaultValue:"unpaid",

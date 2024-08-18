@@ -17,7 +17,7 @@ module.exports=(sequelize,DataTypes)=>{
         },
         orderStatus:{
             type:DataTypes.ENUM,
-            values:["panding","delivered","preparation","ontheway","cancelled"],
+            values:["pending","delivered","preparation","ontheway","cancelled"],
             defaultValue:"panding",
 
         }

@@ -1,6 +1,6 @@
-const { FOREIGNKEYS } = require("sequelize/lib/query-types");
+
 const dbConfig = require("../config/dbConfig");
-const { Sequelize, DataTypes, HasMany, BelongsTo } = require("sequelize");
+const { Sequelize, DataTypes} = require("sequelize");
 
 
 // la sequelize yo config haru lag ani database connect gardey vaneko hae
@@ -40,7 +40,6 @@ db.payments=require('./payment.js')(sequelize,DataTypes)
 db.orderDetails=require('./orderDetails.js')(sequelize,DataTypes)
 
 
-
 //Cart relations
 db.users.hasMany(db.carts,{freignkey:"userId"})
 db.carts.belongsTo(db.users,{freignkey:"userId"})
@@ -51,15 +50,18 @@ db.carts.belongsTo(db.products,{freignkey:"productId"})
 //OdrerDetails relation
 db.products.hasMany(db.orderDetails,{freignkey:"productId"})
 db.orderDetails.belongsTo(db.products,{freignkey:"productId"})
-
+//order-orderDetails
 db.orders.hasMany(db.orderDetails,{freignkey:"orderId"})
 db.orderDetails.belongsTo(db.orders,{freignkey:"orderId"})
 
-//Payment realation
-db.orders.hasMany(db.payments,{freignkey:"orderId"})
-db.payments.belongsTo(db.orders,{freignkey:"orderId"})
+//order-Payment realation
+db.payments.hasMany(db.orders,{freignkey:"paymentId"})
+db.orders.belongsTo(db.payments,{freignkey:"paymentId"})
+//order-user relation 
+db.users.hasMany(db.orders,{foreignKey : 'userId'})
+db.orders.belongsTo(db.users,{foreignKey : 'userId'})
 
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ force:false}).then(() => {
   console.log("yes re-sync done");
 });
 

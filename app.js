@@ -22,18 +22,18 @@ const authRoute=require("./routers/auth/authRoute")
 const productRoute=require('./routers/admin/productRoute')
 const cartRoute=require('./routers/auth/cartRoute')
 const contactRouter=require('./routers/user/contactUsRoute')
+const orderRoute=require('./routers/user/orderRoute')
 
 app.use("/auth",authRoute)
 app.use('/admin/',productRoute)
 app.use('/cart',cartRoute)
 app.use('/user',contactRouter)
+app.use('/user/order',orderRoute)
 app.use(express.static('uploads'))
 adminSeeder()
 app.get("/",(req,res)=>{
     res.json({message:"Server is running"})
 })
-
-
 
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`)

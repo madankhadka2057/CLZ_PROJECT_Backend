@@ -1,5 +1,5 @@
 const { where, json } = require("sequelize");
-const { products, carts } = require("../../model");
+const { products, carts, users } = require("../../model");
 
 exports.addToCart = async (req, res) => {
     const productId = req.body.id;
@@ -45,9 +45,14 @@ exports.addToCart = async (req, res) => {
     }
     const newCart= await carts.findAll({
         where:{userId:userId},
-        include:{
-            model:products
-        }
+        include: [
+            {
+                model: products,
+            },
+            {
+                model: users,
+            }
+        ]
     })
     console.log(newCart)
     res.status(200).json({
@@ -64,10 +69,14 @@ exports.fetchCart=async(req,res)=>{
     }
     const data=await carts.findAll({
         where:{userId:userId},
-        include: {
-            model: products, // Assuming you have a `products` model
-
-          }
+        include: [
+            {
+                model: products,
+            },
+            {
+                model: users,
+            }
+        ]
     })
 
     if(!data){
