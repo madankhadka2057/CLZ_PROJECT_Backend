@@ -2,12 +2,9 @@
 const dbConfig = require("../config/dbConfig");
 const { Sequelize, DataTypes} = require("sequelize");
 
-
-// la sequelize yo config haru lag ani database connect gardey vaneko hae
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  operatorsAliases: false,
   port:3306,
   pool: {
     max: dbConfig.pool.max,
@@ -16,7 +13,6 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     idle: dbConfig.pool.idle,
   },
 });
-
 sequelize
   .authenticate()
   .then(() => {
@@ -27,7 +23,6 @@ sequelize
   });
 
 const db = {};
-
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
@@ -39,8 +34,7 @@ db.orders=require('./orders.js')(sequelize,DataTypes)
 db.payments=require('./payment.js')(sequelize,DataTypes)
 db.orderDetails=require('./orderDetails.js')(sequelize,DataTypes)
 
-
-//Cart relations
+// Cart relations
 db.users.hasMany(db.carts,{freignkey:"userId"})
 db.carts.belongsTo(db.users,{freignkey:"userId"})
 

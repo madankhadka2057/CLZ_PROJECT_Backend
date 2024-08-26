@@ -127,11 +127,12 @@ exports.updateProduct = async (req, res) => {
             message: "Product with this name is already exist"
         })
     }
+    const oldImage=checkProduct.img
     const lengthOfBackendUrl=process.env.BACKEND_URL.length
     const cutOldImage=oldImage.slice(lengthOfBackendUrl)
+    console.log(req.file)
     if(req.file&&req.file.filename)
         {
-            console.log("Madan khadka")
             fs.unlink(`./uploads/${cutOldImage}`,(err)=>{
                 if(err){
                     console.log("Error to delete image",err)
@@ -152,11 +153,7 @@ exports.updateProduct = async (req, res) => {
             id:id
         }
     })
-    const data = await products.findOne({
-        where: {
-          id: id
-        }
-      });
+    const data = await products.findAll();
     res.status(200).json({
         message: "Product Updated successfully",
         data: data

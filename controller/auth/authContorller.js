@@ -14,7 +14,6 @@ exports.registerUser = async (req, res) => {
         phoneNumber:req.body.phoneNumber,
         password:hashedPass
     }
-
     if (!userDetails.userName || !userDetails.email || !userDetails.phoneNumber || !userDetails.password) {
         return res.status(400).json({
             message: "All filds are required"
@@ -52,8 +51,8 @@ exports.loginUser=async(req,res)=>{
     if(existEmail){
         const isMatch=bcrypt.compareSync(password,existEmail.password)
         if(isMatch){
-            const token=jwt.sign({id:existEmail.id},process.env.SECRET_KEY,{
-                expiresIn:"20d"
+            const token=jwt.sign({id:existEmail.id,role:existEmail.role},process.env.SECRET_KEY,{
+                expiresIn:"10d"
             })
             res.status(200).json({
                 message:"Login successfully ",
@@ -70,6 +69,52 @@ exports.loginUser=async(req,res)=>{
     }else{
         res.status(400).json({
             message:"User doesn't exist with this email"
+        })
+    }
+}
+
+
+exports.loginAdmin=async(req,res)=>{
+    const {email,password}=req.body
+    if(!email||!password){
+        return res.status(400).json({
+            message:"Please entered email or password"
+        })
+    }
+   const existEmail= await users.findOne({
+    where:{
+        email
+    }
+   })
+    if(existEmail){
+        const isMatch=bcrypt.compareSync(password,existEmail.password)
+
+        if(isMatch){
+            
+            if(existEmail.role!=="admin"){
+                return res.status(400).json({
+                    message:"Unauthorized access"
+                })
+            }
+            const token=jwt.sign({id:existEmail.id,role:existEmail.role},process.env.SECRET_KEY,{
+                expiresIn:"10d"
+            })
+
+            res.status(200).json({
+                message:"Login successfully ",
+                data:existEmail,
+                token:token
+            })
+           
+        }else{
+            res.status(400).json({
+                message:"Invalid password"
+            })
+        }
+        
+    }else{
+        res.status(400).json({
+            message:"Admin doesn't exist with this email"
         })
     }
 }
