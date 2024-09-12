@@ -1,5 +1,5 @@
 
-const { orders, payments, orderDetails, carts, products, users } = require("../../model");
+const { orders, payments, orderDetails, carts, products, users, sequelize } = require("../../model");
 const axios = require('axios');
 const payment = require("../../model/payment");
 exports.crateOrder = async (req, res) => {
@@ -28,10 +28,10 @@ exports.crateOrder = async (req, res) => {
             orderId: orderdata.id
         })
         await carts.destroy({ where: { productId: items[i].productId } })
-        console.log("deleted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        // console.log("deleted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     }
     if (paymentDetails.paymentMethod == "khalti") {
-        console.log(orderdata.id)
+        // console.log(orderdata.id)
         var data = {
             return_url: "http://localhost:5173/",
             website_url: "http://localhost:3000/",
@@ -65,7 +65,7 @@ exports.crateOrder = async (req, res) => {
 
 exports.verifyTransaction = async (req, res) => {
     const { pidx } = req.body
-    const userId = req.user?.id
+    // const userId = req.user?.id
     if (!pidx) {
         return res.status(400).json({
             message: "Please provide pidx"
@@ -76,16 +76,20 @@ exports.verifyTransaction = async (req, res) => {
             'Authorization': "Key b87a211834824f14a20a48fcf3451653"
         }
     })
-    if (response.data.status == "Completed") {
-        await payments.update({ paymentStatus: 'paid' }, {
+    console.log(response)
+    if (response.data.status == "Pending") {
+        const verify = await payments.update({ paymentStatus: 'paid' }, {
             where: {
                 pidx: pidx
             }
         })
+        console.log("verify pidx", verify)
         res.status(200).json({
-            message: "Payment verified successfully"
+            message: "Payment verified successfully",
+            data: verify
         })
     } else {
+        console.log("payment is not verified")
         res.status(200).json({
             message: "Payment not verified"
         })
@@ -135,7 +139,7 @@ exports.getOrders = async (req, res) => {
 }
 exports.getOrdersDetails = async (req, res) => {
     const { orderId } = req.params
-    console.log(req.params)
+    // console.log(req.params)
     const Details = await orderDetails.findAll({
         where: {
             orderId
@@ -164,7 +168,7 @@ exports.cancleOrder = async (req, res) => {
     const { orderStatus } = req.body
     const id = orderId
     const orderData = await orders.findByPk(id)
-    console.log(orderData.orderStatus != "ontheway")
+    // console.log(orderData.orderStatus != "ontheway")
     if (orderData.orderStatus != "ontheway") {
         await orders.update({ orderStatus: orderStatus }, {
             where: {
@@ -202,16 +206,25 @@ exports.cancleOrder = async (req, res) => {
 }
 exports.changeOrderStatus = async (req, res) => {
     const { orderId } = req.params
-    const { orderStatus } = req.body
-    console.log("status is:= ", req.body)
-    const id = orderId
-    const orderData = await orders.findByPk(id)
+    const { orderStatus,paymentStatus} = req.body
+    console.log(paymentStatus)
+    const t = await sequelize.transaction();
+    // const id = orderId
+    const orderData = await orders.findByPk(orderId, {
+        include: [{ model: payments }],
+        transaction: t
+    });
     if (orderData) {
-        await orders.update({ orderStatus: orderStatus }, {
-            where: {
-                id: orderId
-            }
-        })
+        await orderData.update({ orderStatus: orderStatus }, { transaction: t });
+
+        if (orderData.payment) {
+            // Update payment status within the transaction
+            await orderData.payment.update({ paymentStatus: paymentStatus }, { transaction: t });
+        } else {
+            throw new Error("Payment not found");
+        }
+
+        await t.commit();
         const order = await orders.findAll({
             include: [
                 {
@@ -232,9 +245,10 @@ exports.changeOrderStatus = async (req, res) => {
         })
     }
 }
+//deleteOrder by admin!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 exports.deleteOrder = async (req, res) => {
     const { orderId } = req.params
-    console.log(req.params)
+    // console.log(req.params)
     const order = orders.findByPk(orderId)
     if (order) {
         const response = await orders.destroy({
@@ -253,3 +267,25 @@ exports.deleteOrder = async (req, res) => {
         })
     }
 }
+//deleteOrder by user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+exports.deleteMyorder = async (req, res) => {
+    const { id } = req.params
+    console.log(req.params)
+    const order = orders.findByPk(id)
+    if (order) {
+        await orders.destroy({
+            where: {
+                id: id
+            }
+        })
+        
+            res.status(200).json({
+                message: "Order deleted successfully",
+            })
+        } else {
+            res.status(400).json({
+                message: "Order not fount with that id",
+                data: []
+            })
+        }
+    }

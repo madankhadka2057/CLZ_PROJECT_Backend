@@ -14,7 +14,7 @@ function checkRole(...role){
         if(role.includes(userDetails.role)){
             next()
         }else{
-            res.status(404).json({
+            res.status(400).json({
                 message:"You doesn't have a premission "
             })
         }
